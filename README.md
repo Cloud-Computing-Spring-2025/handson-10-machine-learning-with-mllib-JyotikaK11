@@ -1,18 +1,16 @@
 # handson-10-MachineLearning-with-MLlib.
 
-#  Customer Churn Prediction with MLlib
+# Customer Churn Prediction with MLlib
 
 This project uses Apache Spark MLlib to predict customer churn based on structured customer data. You will preprocess data, train classification models, perform feature selection, and tune hyperparameters using cross-validation.
 
 ---
 
-
-
 Build and compare machine learning models using PySpark to predict whether a customer will churn based on their service usage and subscription features.
 
 ---
 
-##  Dataset
+## Dataset
 
 The dataset used is `customer_churn.csv`, which includes features like:
 
@@ -20,7 +18,7 @@ The dataset used is `customer_churn.csv`, which includes features like:
 
 ---
 
-##  Tasks
+## Tasks
 
 ### Task 1: Data Preprocessing and Feature Engineering
 
@@ -33,18 +31,18 @@ Clean the dataset and prepare features for ML algorithms.
 3. Assemble numeric and encoded features into a single feature vector with `VectorAssembler`.
 
 **Code Output:**
-
 ```
 +--------------------+-----------+
 |features            |ChurnIndex |
 +--------------------+-----------+
-|[0.0,12.0,29.85,29...|0.0        |
-|[0.0,1.0,56.95,56....|1.0        |
-|[1.0,5.0,53.85,108...|0.0        |
-|[0.0,2.0,42.30,184...|1.0        |
-|[0.0,8.0,70.70,151...|0.0        |
+|[0.0,3.0,94.8,267.3,|        0.0 |
+|(8,[1,2,3,6],[29.0,7|        0.0 |
+|(8,[1,2,3,6],[15.0,9|        0.0 |
+|(8,[1,2,3,4],[53.0,3|        0.0 |
+|(8,[2,5,6],[83.35,1.|        0.0 |
 +--------------------+-----------+
 ```
+
 ---
 
 ### Task 2: Train and Evaluate Logistic Regression Model
@@ -57,14 +55,25 @@ Train a logistic regression model and evaluate it using AUC (Area Under ROC Curv
 2. Train a logistic regression model.
 3. Use `BinaryClassificationEvaluator` to evaluate.
 
-**Code Output Example:**
+**Code Output:**
 ```
-Logistic Regression Model Accuracy: 0.83
+Sample Predictions:
++-------+-----------+------------------------------------------+
+|Label  |Prediction |Probability                               |
++-------+-----------+------------------------------------------+
+|   0.0 |         0 |[0.5919130918951714,0.4080869081048286] |
+|   1.0 |         0 |[0.8440056167635827,0.15599438323641734]|
+|   0.0 |         0 |[0.8979433651527896,0.10205663484721039]|
+|   1.0 |         1 |[0.3367126294222577,0.6632873705777422] |
+|   0.0 |         0 |[0.5395984060468031,0.4604015939531969] |
++-------+-----------+------------------------------------------+
+
+Logistic Regression Model Accuracy (AUC): 0.75
 ```
 
 ---
 
-###  Task 3: Feature Selection using Chi-Square Test
+### Task 3: Feature Selection using Chi-Square Test
 
 **Objective:**  
 Select the top 5 most important features using Chi-Square feature selection.
@@ -73,18 +82,17 @@ Select the top 5 most important features using Chi-Square feature selection.
 1. Use `ChiSqSelector` to rank and select top 5 features.
 2. Print the selected feature vectors.
 
-**Code Output Example:**
+**Code Output:**
 ```
 +--------------------+-----------+
 |selectedFeatures    |ChurnIndex |
 +--------------------+-----------+
-|[0.0,29.85,0.0,0.0...|0.0        |
-|[1.0,56.95,1.0,0.0...|1.0        |
-|[0.0,53.85,0.0,1.0...|0.0        |
-|[1.0,42.30,0.0,0.0...|1.0        |
-|[0.0,70.70,0.0,1.0...|0.0        |
+|[0.0,3.0,1.0,0.0,1.0|        0.0 |
+|(5,[1,3],[29.0,1.0])|        0.0 |
+|(5,[1,3],[15.0,1.0])|        0.0 |
+|(5,[1],[53.0])      |        0.0 |
+|(5,[2,3],[1.0,1.0]) |        0.0 |
 +--------------------+-----------+
-
 ```
 
 ---
@@ -105,30 +113,45 @@ Use CrossValidator to tune models and compare their AUC performance.
 2. Use `CrossValidator` for 5-fold cross-validation.
 3. Evaluate and print best model results.
 
-**Code Output Example:**
+**Code Output:**
 ```
 Tuning LogisticRegression...
-LogisticRegression Best Model Accuracy (AUC): 0.84
-Best Params for LogisticRegression: regParam=0.01, maxIter=20
+LogisticRegression Best Model Accuracy (AUC): 0.75
+Best Params for LogisticRegression:
+  maxIter = 100
+  regParam = 0.01
 
 Tuning DecisionTree...
-DecisionTree Best Model Accuracy (AUC): 0.77
-Best Params for DecisionTree: maxDepth=10
+DecisionTree Best Model Accuracy (AUC): 0.80
+Best Params for DecisionTree:
+  maxDepth = 5
 
 Tuning RandomForest...
-RandomForest Best Model Accuracy (AUC): 0.86
-Best Params for RandomForest: maxDepth=15
-numTrees=50
+RandomForest Best Model Accuracy (AUC): 0.78
+Best Params for RandomForest:
+  maxDepth = 5
+  numTrees = 10
 
 Tuning GBT...
-GBT Best Model Accuracy (AUC): 0.88
-Best Params for GBT: maxDepth=10
-maxIter=20
-
+GBT Best Model Accuracy (AUC): 0.80
+Best Params for GBT:
+  maxDepth = 5
+  maxIter = 20
 ```
+
 ---
 
-##  Execution Instructions
+### 🏆 Final Model Selection
+
+```
+Best Model Overall: DecisionTree with AUC = 0.80
+Best Hyperparameters:
+  maxDepth = 5
+```
+
+---
+
+## Execution Instructions
 
 ### 1. Prerequisites
 
@@ -138,9 +161,22 @@ maxIter=20
 
 ### 2. Run the Project
 
-### 2. Run the Pr
+```bash
+spark-submit customer-churn-analysis.py
+```
+
+### 3. View Results
 
 ```bash
-spark-submit churn_prediction.py
+cat output/final_output.txt
 ```
-### Make sure to include your original ouput and explain the code
+
+All outputs from all tasks will be written to this file.
+
+---
+
+## Notes
+
+- AUC is used as the evaluation metric across all models.
+- Chi-Square is used for feature selection.
+- Gradient Boosted Trees and Decision Trees achieved the highest AUC (0.80), but the best-performing model overall was **Decision Tree** based on its interpretability and stability.
